@@ -22,6 +22,10 @@
 
 package org.solovyev.android.checkout;
 
+import static java.lang.System.currentTimeMillis;
+import static org.solovyev.android.checkout.ResponseCodes.ITEM_ALREADY_OWNED;
+import static org.solovyev.android.checkout.ResponseCodes.ITEM_NOT_OWNED;
+
 import android.app.Activity;
 import android.app.Application;
 import android.app.Service;
@@ -44,10 +48,6 @@ import java.util.concurrent.ThreadFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
-
-import static java.lang.System.currentTimeMillis;
-import static org.solovyev.android.checkout.ResponseCodes.ITEM_ALREADY_OWNED;
-import static org.solovyev.android.checkout.ResponseCodes.ITEM_NOT_OWNED;
 
 public final class Billing {
 
@@ -788,6 +788,29 @@ public final class Billing {
 		}
 
 		@Override
+		public int changeSubscription(@Nonnull List<String> oldSkus,
+				@Nonnull String newSku, @Nullable String payload,
+				@Nonnull PurchaseFlow purchaseFlow) {
+			Check.isNotEmpty(oldSkus);
+			Check.isNotEmpty(newSku);
+			return runWhenConnected(
+					new ChangePurchaseRequest(ProductTypes.SUBSCRIPTION, oldSkus, newSku, payload),
+					wrapListener(purchaseFlow), tag);
+		}
+
+		@Override
+		public int changeSubscription(@Nonnull List<Sku> oldSkus, @Nonnull Sku newSku,
+				@Nullable String payload, @Nonnull PurchaseFlow purchaseFlow) {
+			Check.isTrue(ProductTypes.SUBSCRIPTION.equals(newSku.product), "Only subscriptions can be downgraded/upgraded");
+			final List<String> oldSkuIds = new ArrayList<>(oldSkus.size());
+			for (Sku oldSku : oldSkus) {
+				Check.isTrue(oldSku.product.equals(newSku.product), "Product type can't be changed");
+				oldSkuIds.add(oldSku.id);
+			}
+			return changeSubscription(oldSkuIds, newSku.id, payload, purchaseFlow);
+		}
+
+		@Override
 		public int purchase(@Nonnull Sku sku, @Nullable String payload, @Nonnull PurchaseFlow purchaseFlow) {
 			return purchase(sku.product, sku.id, payload, purchaseFlow);
 		}
@@ -912,6 +935,7 @@ public final class Billing {
 			}
 			switch (type) {
 				case PURCHASE:
+				case CHANGE_PURCHASE:
 				case CONSUME_PURCHASE:
 					// these requests might affect the state of purchases => we need to invalidate caches.
 					// see Billing#onPurchaseFinished() also
@@ -928,6 +952,7 @@ public final class Billing {
 			// clear caches if such situation occurred
 			switch (type) {
 				case PURCHASE:
+				case CHANGE_PURCHASE:
 					if (response == ITEM_ALREADY_OWNED) {
 						cache.removeAll(RequestType.GET_PURCHASES.getCacheKeyType());
 					}

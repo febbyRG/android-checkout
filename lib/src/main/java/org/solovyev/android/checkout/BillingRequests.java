@@ -22,9 +22,10 @@
 
 package org.solovyev.android.checkout;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * Available billing request methods.
@@ -107,7 +108,29 @@ public interface BillingRequests {
 	 */
 	int purchase(@Nonnull String product, @Nonnull String sku, @Nullable String payload, @Nonnull PurchaseFlow purchaseFlow);
 
+	/**
+	 * @see #purchase(String, String, String, PurchaseFlow)
+	 */
 	int purchase(@Nonnull Sku sku, @Nullable String payload, @Nonnull PurchaseFlow purchaseFlow);
+
+	/**
+	 * Upgrades/downgrades a list of current subscriptions to a given subscription. This method only works in conjunction with
+	 * {@link ActivityCheckout}. See {@link ActivityCheckout} for more information.
+	 * See <a href="https://developer.android.com/google/play/billing/billing_reference.html#upgrade-getBuyIntentToReplaceSkus">getBuyIntentToReplaceSkus()</a> docs.
+	 * @param oldSkus list of current subscriptions to be changed
+	 * @param newSku new subscription
+	 * @param payload developer's payload
+	 * @param purchaseFlow purchase flow associated with purchase process
+	 * @return request id
+     */
+	int changeSubscription(@Nonnull List<String> oldSkus,
+			@Nonnull String newSku, @Nullable String payload, @Nonnull PurchaseFlow purchaseFlow);
+
+	/**
+	 * @see #changeSubscription(List, String, String, PurchaseFlow)
+	 */
+	int changeSubscription(@Nonnull List<Sku> oldSkus,
+			@Nonnull Sku newSku, @Nullable String payload, @Nonnull PurchaseFlow purchaseFlow);
 
 	/**
 	 * Consumes previously purchased item.
