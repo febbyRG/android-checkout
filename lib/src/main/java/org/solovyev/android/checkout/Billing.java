@@ -51,7 +51,8 @@ import javax.annotation.concurrent.GuardedBy;
 
 public final class Billing {
 
-	private static final int API_VERSION = 3;
+	static final int VERSION_3 = 3;
+	static final int VERSION_5 = 5;
 
 	@Nonnull
 	private static final String TAG = "Checkout";
@@ -599,7 +600,7 @@ public final class Billing {
 				Check.isNotNull(localService);
 				// service is connected, let's start request
 				try {
-					localRequest.start(localService, API_VERSION, context.getPackageName());
+					localRequest.start(localService, context.getPackageName());
 				} catch (RemoteException e) {
 					localRequest.onError(e);
 				} catch (RequestException e) {
@@ -734,9 +735,20 @@ public final class Billing {
 		}
 
 		@Override
-		public int isBillingSupported(@Nonnull final String product, @Nonnull RequestListener<Object> listener) {
+		public int isBillingSupported(@Nonnull String product, int apiVersion) {
+			return 0;
+		}
+
+		@Override
+		public int isBillingSupported(@Nonnull String product, int apiVersion,
+				@Nonnull RequestListener<Object> listener) {
 			Check.isNotEmpty(product);
-			return runWhenConnected(new BillingSupportedRequest(product), wrapListener(listener), tag);
+			return runWhenConnected(new BillingSupportedRequest(product, apiVersion), wrapListener(listener), tag);
+		}
+
+		@Override
+		public int isBillingSupported(@Nonnull final String product, @Nonnull RequestListener<Object> listener) {
+			return isBillingSupported(product, VERSION_3, listener);
 		}
 
 		@Nonnull

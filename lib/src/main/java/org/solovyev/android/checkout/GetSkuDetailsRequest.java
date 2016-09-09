@@ -55,7 +55,7 @@ final class GetSkuDetailsRequest extends Request<Skus> {
 	}
 
 	@Override
-	void start(@Nonnull IInAppBillingService service, int apiVersion, @Nonnull String packageName) throws RemoteException, RequestException {
+	void start(@Nonnull IInAppBillingService service, @Nonnull String packageName) throws RemoteException, RequestException {
 		final List<Sku> allSkuDetails = new ArrayList<>();
 		for (int start = 0; start < skus.size(); start += MAX_SIZE_PER_REQUEST) {
 			final int end = Math.min(skus.size(), start + MAX_SIZE_PER_REQUEST);

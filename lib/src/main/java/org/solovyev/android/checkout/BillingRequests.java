@@ -43,6 +43,7 @@ public interface BillingRequests {
 	 * @see org.solovyev.android.checkout.ProductTypes
 	 */
 	int isBillingSupported(@Nonnull String product);
+	int isBillingSupported(@Nonnull String product, int apiVersion);
 
 	/**
 	 * Checks if billing for specified <var>product</var> is supported and returns result through <var>listener</var>
@@ -53,6 +54,7 @@ public interface BillingRequests {
 	 * @see org.solovyev.android.checkout.ProductTypes
 	 */
 	int isBillingSupported(@Nonnull String product, @Nonnull RequestListener<Object> listener);
+	int isBillingSupported(@Nonnull String product, int apiVersion, @Nonnull RequestListener<Object> listener);
 
 	/**
 	 * Requests list of purchased items of <var>product</var> type.

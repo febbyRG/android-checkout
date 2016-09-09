@@ -22,6 +22,9 @@
 
 package org.solovyev.android.checkout;
 
+import static org.solovyev.android.checkout.ResponseCodes.EXCEPTION;
+import static org.solovyev.android.checkout.ResponseCodes.OK;
+
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -33,9 +36,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
-
-import static org.solovyev.android.checkout.ResponseCodes.EXCEPTION;
-import static org.solovyev.android.checkout.ResponseCodes.OK;
 
 /**
  * Asynchronous operation which is done with connected billing service
@@ -80,7 +80,8 @@ abstract class Request<R> {
 		return id;
 	}
 
-	abstract void start(@Nonnull IInAppBillingService service, int apiVersion, @Nonnull String packageName) throws RemoteException, RequestException;
+	abstract void start(@Nonnull IInAppBillingService service, @Nonnull String packageName)
+			throws RemoteException, RequestException;
 
 	/**
 	 * @return request tag, object which is associated with this request

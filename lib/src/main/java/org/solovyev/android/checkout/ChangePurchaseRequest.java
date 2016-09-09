@@ -36,7 +36,7 @@ final class ChangePurchaseRequest extends Request<PendingIntent> {
     }
 
     @Override
-    void start(@Nonnull IInAppBillingService service, int apiVersion, @Nonnull String packageName) throws
+    void start(@Nonnull IInAppBillingService service, @Nonnull String packageName) throws
             RemoteException, RequestException {
         final Bundle bundle = service.getBuyIntentToReplaceSkus(apiVersion, packageName, oldSkus, newSku, product, payload == null ? "" : payload);
         if (handleError(bundle)) {

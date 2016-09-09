@@ -49,7 +49,7 @@ final class PurchaseRequest extends Request<PendingIntent> {
 	}
 
 	@Override
-	void start(@Nonnull IInAppBillingService service, int apiVersion, @Nonnull String packageName) throws RemoteException, RequestException {
+	void start(@Nonnull IInAppBillingService service, @Nonnull String packageName) throws RemoteException, RequestException {
 		final Bundle bundle = service.getBuyIntent(apiVersion, packageName, sku, product, payload == null ? "" : payload);
 		if (handleError(bundle)) {
 			return;
